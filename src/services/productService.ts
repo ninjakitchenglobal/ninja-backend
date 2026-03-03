@@ -54,7 +54,7 @@ export const getOneProductService = async (params: IParams) => {
 
 export const getRecommendationsService = async () => {
   const recommendations = await productModel.find({
-    category: 'recommendation',
+    category: 'recommendations',
   });
 
   return {
@@ -119,3 +119,4 @@ export const deleteProductService = async (params: IParams) => {
     data: null,
   };
 };
+
