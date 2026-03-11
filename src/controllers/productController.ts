@@ -11,6 +11,7 @@ import {
   getSomeProductsService,
   deleteProductService,
   getProductsByCategoryService,
+  searchFOrProductsService,
 } from '../services/productService';
 
 export const addProduct = handleRequest(addProductService);
@@ -21,3 +22,5 @@ export const getPopular = handleRequest(getPopularService);
 export const getSomeProducts = handleRequest(getSomeProductsService);
 export const deleteProduct = handleRequest(deleteProductService);
 export const getProductByCategory = handleRequest(getProductsByCategoryService);
+
+export const searchProducts = handleRequest(searchFOrProductsService);

@@ -120,3 +120,16 @@ export const deleteProductService = async (params: IParams) => {
   };
 };
 
+export const searchFOrProductsService = async (params: IParams) => {
+  const { searchParams } = params.query;
+
+  const products = await productModel.find({
+    title: { $regex: searchParams, $options: 'i' },
+  });
+
+  return {
+    success: true,
+    message: 'Products retrieved',
+    data: products,
+  };
+};

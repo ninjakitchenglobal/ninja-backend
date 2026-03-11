@@ -10,6 +10,7 @@ import {
   getSomeProducts,
   deleteProduct,
   getProductByCategory,
+  searchProducts,
 } from '../controllers/productController';
 
 const productRouter = Router();
@@ -25,5 +26,6 @@ productRouter.get(
   '/get-product-by-category/:productCategory',
   getProductByCategory,
 );
+productRouter.get('/product-search/:searchParams', searchProducts);
 
 export default productRouter;
