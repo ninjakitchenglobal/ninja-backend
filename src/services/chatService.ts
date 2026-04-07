@@ -6,7 +6,11 @@ import { Types } from 'mongoose';
 //IMPORTING MODELS
 import chatModel from '../models/chatModel';
 import productModel from '../models/productModel';
+import userModel from '../models/userModel';
 import { IServiceResponse } from '../interfaces/IServiceResponse';
+
+import { newPotentialPurchaseAlert } from '../types/emails/confirm_account';
+import transporter from '../types/nodemailer_transporter';
 
 type ChatServiceData = {
   chatId: Types.ObjectId;
@@ -98,5 +102,32 @@ export const getAllAdminChatsService = async (params: IParams) => {
     success: true,
     message: 'Purchase chats retrieved',
     data: chats,
+  };
+};
+
+export const notifyAdmin = async (params: IParams) => {
+  const { adminId } = params.data;
+
+  const admin = await userModel.findById(adminId);
+
+  if (!admin) {
+    throw new BadRequestError('There is no user with the given Id');
+  }
+
+  const emailInfo = newPotentialPurchaseAlert(admin.email);
+
+  transporter.sendMail(emailInfo, (error, info) => {
+    if (error) {
+      console.error('Email error:', error);
+      return;
+    }
+  });
+
+  console.log('Email sent');
+
+  return {
+    success: true,
+    message: 'Admin notified',
+    data: null,
   };
 };

@@ -6,7 +6,7 @@ import { Server } from 'socket.io';
 import chatModel from './models/chatModel';
 import userModel from './models/userModel';
 import transporter from './types/nodemailer_transporter';
-import newMessageAlert from './types/emails/confirm_account';
+import { newMessageAlert } from './types/emails/confirm_account';
 import { BadRequestError } from './errors';
 
 dotenv.config();
@@ -39,25 +39,37 @@ export const serverMain = async () => {
       socket.on('send-message', async ({ chatId, senderId, text }) => {
         const chat = await chatModel.findById(chatId);
 
-        if (!chat) return;
+        if (!chat) {
+          throw new BadRequestError('No chat found');
+        }
 
         if (senderId === chat?.sellerId) {
-          const receiver = await userModel.findOne({
-            _id: chat?.buyerId,
-          });
-          const newEmailInfo = newMessageAlert(receiver?.email!);
+          const receiver = await userModel.findById(chat?.buyerId);
+
+          if (!receiver) {
+            console.log('No receiver where sender is ninja');
+            return socket.emit(
+              'error',
+              'Receiver not found where sender is ninja',
+            );
+          }
+
+          const newEmailInfo = newMessageAlert(receiver.email);
           transporter.sendMail(newEmailInfo, (error, info) => {
             if (error) {
-              throw new BadRequestError(
-                `Error sending email: ${JSON.stringify(error)}`,
-              );
+              console.error('Email error:', error);
+              return;
             }
           });
         } else {
-          const receiver = await userModel.findOne({
-            _id: chat?.sellerId,
-          });
-          const newEmailInfo = newMessageAlert(receiver?.email!);
+          const receiver = await userModel.findById(chat?.sellerId);
+
+          if (!receiver) {
+            console.log('No receiver');
+            return socket.emit('error', 'Receiver not found');
+          }
+
+          const newEmailInfo = newMessageAlert(receiver.email!);
           transporter.sendMail(newEmailInfo, (error, info) => {
             if (error) {
               throw new BadRequestError(
