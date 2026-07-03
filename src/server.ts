@@ -6,7 +6,7 @@ import { Server } from 'socket.io';
 import chatModel from './models/chatModel';
 import userModel from './models/userModel';
 import transporter from './types/nodemailer_transporter';
-import { newMessageAlert } from './types/emails/confirm_account';
+import { newMessageAlert } from './types/emails/emailTemplates';
 import { BadRequestError } from './errors';
 
 dotenv.config();

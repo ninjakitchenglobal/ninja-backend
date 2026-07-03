@@ -9,7 +9,7 @@ import productModel from '../models/productModel';
 import userModel from '../models/userModel';
 import { IServiceResponse } from '../interfaces/IServiceResponse';
 
-import { newPotentialPurchaseAlert } from '../types/emails/confirm_account';
+import { newPotentialPurchaseAlert } from '../types/emails/emailTemplates';
 import transporter from '../types/nodemailer_transporter';
 
 type ChatServiceData = {

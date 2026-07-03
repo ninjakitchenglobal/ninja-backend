@@ -6,6 +6,7 @@ import cors from 'cors';
 import authRouter from './routes/authRoutes';
 import productRouter from './routes/productRoute';
 import chatRouter from './routes/chatRoute';
+import purchaseRouter from './routes/purchaseRoute';
 
 //IMPORTING CUSTOM MIDDLEWARE
 import errorHandlerMiddleware from './middleware/err-handler';
@@ -22,6 +23,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/api/v1/auth/', authRouter);
 app.use('/api/v1/product/', productRouter);
 app.use('/api/v1/chat/', chatRouter);
+app.use('/api/v1/purchase/', purchaseRouter);
 
 //CUSTOM MIDDLEWARE
 app.use(errorHandlerMiddleware);
