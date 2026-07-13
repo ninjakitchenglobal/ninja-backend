@@ -10,12 +10,11 @@ const PurchaseSchema = new Schema({
     type: String,
     require: [true, 'Please provide your shipping address'],
   },
-  receipt: {
-    type: String,
-    required: [true, 'Buyer receipt not provided, verification failed'],
-  },
   orderNumber: {
     type: Number,
+  },
+  stripeOrderId: {
+    type: String,
   },
 });
 

@@ -1,8 +1,9 @@
 import { BadRequestError } from '../errors';
 import { IParams } from '../interfaces';
 
-//IMPORTING PURCHASE MODEL
+//IMPORTING MODELS
 import purchaseModel from '../models/purchaseModel';
+import userModel from '../models/userModel';
 
 //IMPORTING UTILS
 import generateRandom8DigitNumber from '../utils/generateOrderNumber';
@@ -11,6 +12,8 @@ import {
   buyerPurchaseEmail,
   sellerPurchaseEmail,
 } from '../types/emails/emailTemplates';
+
+import Stripe from 'stripe';
 
 //CREATING A PURCHASE
 export const createPurchaseService = async (params: IParams) => {
@@ -25,7 +28,6 @@ export const createPurchaseService = async (params: IParams) => {
   await purchaseModel.create({
     email,
     address,
-    receipt,
     orderNumber,
   });
 
@@ -56,5 +58,81 @@ export const getPurchasesService = async () => {
     success: true,
     message: 'Here are the product purchases',
     data: purchases,
+  };
+};
+
+//STRIPE PURCHASE FUNCTIONALITY
+export const createStripePurchaseService = async (params: IParams) => {
+  const {
+    price,
+    quantity,
+    name,
+    user,
+    address,
+  }: {
+    price: number;
+    quantity: number;
+    name: string;
+    user: string;
+    address: string;
+  } = params.data;
+
+  //GETTING THE USER
+  const purchasingUser = await userModel.findById(user);
+  if (!purchasingUser) {
+    throw new BadRequestError('Invalid request!');
+  }
+
+  const { email } = purchasingUser;
+
+  const stripe = Stripe(process.env.STRIPE_DEV_KEY!);
+  const session = await stripe.checkout.sessions.create({
+    customer_email: email,
+    line_items: [
+      {
+        price_data: {
+          currency: 'usd',
+          unit_amount: price * 100,
+          product_data: {
+            name,
+          },
+        },
+        quantity,
+      },
+    ],
+    mode: 'payment',
+    success_url: 'https://www.ninjakitchenglobal.com/payment-confirmation',
+    return_url: 'https://www.ninjakitchenglobal.com/make-payment',
+  });
+
+  //SAVING THE PURCHASE TO THE DATABASE
+  const orderNumber = generateRandom8DigitNumber();
+
+  await purchaseModel.create({
+    email,
+    address,
+    orderNumber,
+    stripeOrderId: session.id,
+  });
+
+  //SENDING OUT THE EMAILS
+  const buyerEmailInfo = buyerPurchaseEmail(email, orderNumber, address);
+  const sellerEmailInfo = sellerPurchaseEmail(
+    'ninjakitchenglobe@gmail.com',
+    address,
+    orderNumber,
+  );
+
+  await Promise.all([
+    transporter.sendMail(buyerEmailInfo),
+    transporter.sendMail(sellerEmailInfo),
+  ]);
+
+  return {
+    success: true,
+    message: 'Checkout session is ready',
+    data: {
+      checkoutUrl: session.url,
+    },
   };
 };
