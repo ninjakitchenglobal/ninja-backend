@@ -102,7 +102,6 @@ export const createStripePurchaseService = async (params: IParams) => {
     ],
     mode: 'payment',
     success_url: 'https://www.ninjakitchenglobal.com/payment-confirmation',
-    return_url: 'https://www.ninjakitchenglobal.com/make-payment',
   });
 
   //SAVING THE PURCHASE TO THE DATABASE
