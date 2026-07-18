@@ -119,6 +119,14 @@ export const createStripePurchaseService = async (params: IParams) => {
     stripeOrderId: session.id,
   });
 
+  // RETURN IMMEDIATELY
+const response = {
+  success: true,
+  data: {
+    checkoutUrl: session.url,
+  },
+};
+
   //SENDING OUT THE EMAILS
   const buyerEmailInfo = buyerPurchaseEmail(email, orderNumber, address);
   const sellerEmailInfo = sellerPurchaseEmail(
@@ -127,16 +135,12 @@ export const createStripePurchaseService = async (params: IParams) => {
     orderNumber,
   );
 
-  await Promise.all([
-    transporter.sendMail(buyerEmailInfo),
-    transporter.sendMail(sellerEmailInfo),
-  ]);
+Promise.all([
+  transporter.sendMail(buyerEmailInfo),
+  transporter.sendMail(sellerEmailInfo),
+]).catch(err => {
+  console.error("Email failed:", err);
+});
 
-  return {
-    success: true,
-    message: 'Checkout session is ready',
-    data: {
-      checkoutUrl: session.url,
-    },
-  };
+return response
 };
