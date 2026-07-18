@@ -63,6 +63,7 @@ export const getPurchasesService = async () => {
 
 //STRIPE PURCHASE FUNCTIONALITY
 export const createStripePurchaseService = async (params: IParams) => {
+  console.log("Received stripe request")
   const {
     price,
     quantity,
@@ -103,6 +104,10 @@ export const createStripePurchaseService = async (params: IParams) => {
     mode: 'payment',
     success_url: 'https://www.ninjakitchenglobal.com/payment-confirmation',
   });
+
+  console.log("FInalised stripe request")
+  console.log(session)
+  
 
   //SAVING THE PURCHASE TO THE DATABASE
   const orderNumber = generateRandom8DigitNumber();
