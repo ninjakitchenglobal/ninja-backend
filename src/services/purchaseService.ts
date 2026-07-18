@@ -120,12 +120,13 @@ export const createStripePurchaseService = async (params: IParams) => {
   });
 
   // RETURN IMMEDIATELY
-const response = {
-  success: true,
-  data: {
-    checkoutUrl: session.url,
-  },
-};
+const response =  {
+    success: true,
+    message: 'Checkout session is ready',
+    data: {
+      checkoutUrl: session.url,
+    },
+  };
 
   //SENDING OUT THE EMAILS
   const buyerEmailInfo = buyerPurchaseEmail(email, orderNumber, address);
